@@ -121,17 +121,28 @@ class Simulation:
             if conflicts:
                 for idx, conflict in enumerate(conflicts):
                     dist = conflicts_dist[idx]
+                    print("Found %s", conflict)
+                    print("Conflict distance: %d", dist)
+                    print(conflict.detailed_description)
                     self.logger.error("Found %s", conflict)
                     self.logger.error("Conflict distance: %d", dist)
                     self.logger.error(conflict.detailed_description)
                     for aircraft in self.airport.aircrafts:
                         self.logger.error(aircraft)
+                        print(aircraft.model)
+                        aircraft.has_conflict = True
                 # for conflict in conflicts:
                 #     self.logger.error("Found %s", conflict)
                 #     self.logger.error("Conflict distance: ", dist)
                 #     self.logger.error(conflict.detailed_description)
                 #     for aircraft in self.airport.aircrafts:
                 #         self.logger.error(aircraft)
+
+                # change color for crashing airplanes
+                # print(pair[0].model, pair[1].model)
+                # pair[0].has_conflict = True
+                # pair[1].has_conflict = True
+
                 raise SimulationException("Conflict found")
 
             # Observe

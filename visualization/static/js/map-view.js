@@ -199,7 +199,7 @@ class MapView {
                     color = "#3281FB";
                     break;
                 case "Ramp":
-                    color = "#FB4D32";
+                    color = "#008000";
                     break;
                 case "Taxi":
                     color = "#FEF304";
@@ -207,7 +207,9 @@ class MapView {
                 case "Moving":
                     color = "#000000";
                     break;
-
+                case "Conflict":
+                    color = "#FF0000";
+                    break;
                 default:
                     // moving
                     color = "#1565c0";

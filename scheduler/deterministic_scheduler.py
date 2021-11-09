@@ -30,7 +30,7 @@ class Scheduler(AbstractScheduler):
             # object will be used in other objects; however, be ware that the
             # object will be shared instead of being cloned in the later
             # phases.
-            print("simulation.airport.aircrafts", aircraft)
+            # print("simulation.airport.aircrafts", aircraft)
             if aircraft.itinerary is not None:
                 continue
             itinerary = self.schedule_aircraft(aircraft, simulation)

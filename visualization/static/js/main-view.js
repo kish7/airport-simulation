@@ -209,9 +209,13 @@ class VisualizationView {
                 return "Ramp";
             } else if (aircraft["state"] === "taxi") {
                 return "Taxi";
-            } else if (aircraft["is_delayed"]) {
+            } else if (aircraft["state"] === "conflict") {
+                return "Confilct";
+            }   
+            else if (aircraft["is_delayed"]) {
                 return "Hold";
-            } else {
+            } 
+            else {
                 return "Moving";
             }
         };

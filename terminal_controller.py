@@ -1,3 +1,4 @@
+from aircraft import Aircraft
 from node import Node
 import json
 
@@ -60,6 +61,9 @@ class TerminalController:
         # key is terminal spot id, value is terminal spot (data structure: Node)
         self.terminal_spot_id_2_spot = {}
 
+        # key is the terminal spot id, value is the aircraft number
+        self.waiting_queue = {}
+
         # initialize the values here
         for raw_terminal_spot in raw_terminal_spots:
             json_dict = json.loads(raw_terminal_spot)
@@ -70,6 +74,10 @@ class TerminalController:
             gate_list = terminal_spot_id_2_gates[terminal_spot_id]
             for gate_name in gate_list:
                 self.gate_2_terminal_spot_id[gate_name] = terminal_spot_id
+            
+            self.waiting_queue[terminal_spot_id] = []
+            print("initialize queue with " + terminal_spot_id)
+
 
         # key is aircraft (arrival), value is the destination terminal gate.
         self.arrival_2_gate = {}
@@ -81,10 +89,11 @@ class TerminalController:
         # the values in self.terminal_spot_id_2_access
         # if a intersection node is close to (node.is_close_to) a terminal spot,
         # then we treat it as a terminal spot. However, since the airport graph 
-        # is drawed manually, there might exits several intersection nodes close
+        # is drawed manually, there might exist several intersection nodes close
         # to one terminal spot, therefore we need this set to avoid redundant update
         self.visited_arrivals = set()
         self.visited_departures = set()
+
     
     def add_arrival_gate(self, aircraft, gate_name):
         self.arrival_2_gate[aircraft] = gate_name
@@ -98,6 +107,9 @@ class TerminalController:
         # we need to update the terminal_spot_id_2_access value
         tgt_terminal_spot_id = self.gate_2_terminal_spot_id[gate_name]
         self.terminal_spot_id_2_access[tgt_terminal_spot_id] -= 1
+
+        self.waiting_queue[tgt_terminal_spot_id].append(aircraft)
+        print("append departure to queue " + tgt_terminal_spot_id + " "+ str(aircraft.model))
 
     # when arrival aircraft reaches its destination gate
     def remove_arrival(self, aircraft):
@@ -130,6 +142,8 @@ class TerminalController:
             if aircraft not in self.visited_arrivals:
                 self.terminal_spot_id_2_access[tgt_terminal_spot_id] += 1
                 self.visited_arrivals.add(aircraft)
+                self.waiting_queue[tgt_terminal_spot_id].append(aircraft)
+                print("append arrivial to queue " + str(aircraft.model))
             return True
         return False
     
@@ -158,9 +172,34 @@ class TerminalController:
             self.visited_departures.add(aircraft)
             self.terminal_spot_id_2_access[tgt_terminal_spot_id] += 1
     
-    def get_departure_access(self, gate_name):
+    def get_departure_access(self, gate_name, aircraft):
         tgt_terminal_spot_id = self.gate_2_terminal_spot_id[gate_name]
         # if there any arrival, then cannot add departure
-        if self.terminal_spot_id_2_access[tgt_terminal_spot_id] > 0:
+        if self.terminal_spot_id_2_access[tgt_terminal_spot_id] > 0 \
+                    or (len(self.waiting_queue[tgt_terminal_spot_id]) > 0 \
+                            and not self.waiting_queue[tgt_terminal_spot_id][0].is_departure):
+            self.waiting_queue[tgt_terminal_spot_id].append(aircraft)
+            # print("add departure flights to queue " + str(aircraft.model))
             return False
+
+        if len(self.waiting_queue[tgt_terminal_spot_id]) > 0:
+            print("remove departure flight from waiting queue " + str(self.waiting_queue[tgt_terminal_spot_id][0].model) + " " + str(aircraft.model))
+            self.waiting_queue[tgt_terminal_spot_id].pop(0)
+        # if self.terminal_spot_id_2_access[tgt_terminal_spot_id] > 0:
+        #     return Falses
+        return True
+
+    def get_arrival_access(self, gate_name, aircraft):
+        tgt_terminal_spot_id = self.gate_2_terminal_spot_id[gate_name]
+        # if there any departure, then cannot add arrival
+        if self.terminal_spot_id_2_access[tgt_terminal_spot_id] < 0 \
+                    or (len(self.waiting_queue[tgt_terminal_spot_id]) > 0 \
+                            and self.waiting_queue[tgt_terminal_spot_id][0].is_departure):
+            return False
+
+        if len(self.waiting_queue[tgt_terminal_spot_id]) > 0:
+            print("remove arrival flight from waiting queue " + str(self.waiting_queue[tgt_terminal_spot_id][0].model))
+            self.waiting_queue[tgt_terminal_spot_id].pop(0)
+        # if self.terminal_spot_id_2_access[tgt_terminal_spot_id] > 0:
+        #     return Falses
         return True

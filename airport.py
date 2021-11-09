@@ -108,8 +108,8 @@ class Airport:
             return
 
         for gate, queue in self.gate_queue.items():
-
-            if self.is_occupied_at(gate) or not queue or not self.terminal_controller.get_departure_access(gate.name):
+            # print("airpyt!!!!! " + queue[0])
+            if self.is_occupied_at(gate) or not queue or not self.terminal_controller.get_departure_access(gate.name, queue[0]):
                 continue
 
             # Put the first aircraft in queue into the airport
@@ -143,6 +143,7 @@ class Airport:
         next_tick_time = get_seconds_after(now, sim_time)
         # Only if the scheduled appear time is between now and next tick
         current_tick_flight = scenario.departures.irange(Flight(None, now), Flight(None, next_tick_time), (True, False))
+        
         # For all departure flights
         for flight in list(current_tick_flight):
             gate, aircraft = flight.from_gate, flight.aircraft
@@ -153,7 +154,8 @@ class Airport:
                 runway = self.surface.get_link(runway_name)
                 flight.set_runway(runway)
 
-            if self.is_occupied_at(gate) or self.num_aircrafts_running >= self.max_airpcrafts_running or not self.terminal_controller.get_departure_access(gate.name):
+            if self.is_occupied_at(gate) or self.num_aircrafts_running >= self.max_airpcrafts_running \
+                    or not self.terminal_controller.get_departure_access(gate.name, aircraft):
                 # Adds the flight to queue
                 queue = self.gate_queue.get(gate, deque())
                 queue.append(aircraft)
@@ -172,7 +174,7 @@ class Airport:
                 aircraft.set_location(gate, Aircraft.LOCATION_LEVEL_COARSE)
                 self.add_aircraft(aircraft)
                 self.terminal_controller.add_departure_gate(aircraft, gate.name)
-                print(self.terminal_controller.depature_2_gate.keys())
+                # print(self.terminal_controller.depature_2_gate.keys())
                 self.logger.info("Adds %s into the airport, runway %s",
                                  flight,flight.runway)
 
@@ -193,7 +195,7 @@ class Airport:
                 runway = self.surface.get_link(runway_name)
                 flight.set_runway(runway)
             runway_node, aircraft = flight.runway.end, flight.aircraft
-            if self.is_occupied_at(runway_node):
+            if self.is_occupied_at(runway_node) or not self.terminal_controller.get_arrival_access(gate.name, aircraft):
                 # add the aircraft to queue
                 queue = self.runway_gate_queue.get(runway_node, deque())
                 queue.append(aircraft)
@@ -253,8 +255,8 @@ class Airport:
             self.terminal_controller.remove_departure(aircraft)
 
         for aircraft in to_remove_aircraft_arrival:
-            self.logger.info("Removes arrive %s from the airport", aircraft)
-            print("Removes arrive %s from the airport", aircraft)
+            # self.logger.info("Removes arrive %s from the airport", aircraft)
+            # print("Removes arrive %s from the airport", aircraft)
             # self.intersection_control.unblock_intersections_lock_by_aircraft(aircraft)
             self.aircrafts.remove(aircraft)
             self.intersection_control.remove_aircraft(aircraft)
@@ -298,7 +300,7 @@ class Airport:
 
             __conflicts.append(Conflict((loc1, loc2), pair))
             __conflicts_dist.append(dist)
-        return __conflicts, __conflicts_dist
+        return __conflicts, __conflicts_dist 
 
     def __get_next_conflict(self):
         __conflicts = []

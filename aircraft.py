@@ -88,6 +88,7 @@ class State(enum.Enum):
     taxi = 7
     queue = 8
     atGate = 9
+    conflict = 10
 
 
 class Aircraft:
@@ -138,6 +139,7 @@ class Aircraft:
         self.real_time = ""
         self.appear_time = ""
         self.sim_time = 0
+        self.has_conflict = False
 
     @staticmethod
     def fullname2callsign(fullname):
@@ -350,7 +352,7 @@ class Aircraft:
         passed_links = None
         if self.itinerary:
             self.tick_count += 1
-            print("AIR %s: aircraft tick.", self)
+            # print("AIR %s: aircraft tick.", self)
             passed_links = self.itinerary.tick(self.tick_distance)
             new_speed = self.get_next_speed(self.fronter_info, self.state) + self.speed_uncertainty
             self.set_speed(new_speed)
@@ -366,7 +368,7 @@ class Aircraft:
             self.set_location(self.itinerary.current_precise_location, Aircraft.LOCATION_LEVEL_PRECISE)
         else:
             # self.logger.debug("%s: No itinerary request.", self)
-            print("AIR %s: No itinerary request.", self)
+            # print("AIR %s: No itinerary request.", self)
             pass
 
         self.logger.info("%s at %s", self, self.__coarse_location)
@@ -391,6 +393,10 @@ class Aircraft:
     @property
     def state(self):
         """Identify whether the aircraft is on pushbackway or taxiway"""
+        # add conflict state
+        if self.has_conflict is True:
+            return State.conflict
+
         if self.is_delayed is True:
             self.delayed = True
         if self.itinerary is None or self.itinerary.is_completed:
