@@ -113,6 +113,10 @@ class Simulation:
                 state = self.state_logger.log_on_tick(self)
             self.clock.tick()
 
+            # print(len(state["aircrafts"]))
+            # if len(state["aircrafts"]) >= 1:
+            #     print(state["aircrafts"][0]["callsign"] + " "+state["aircrafts"][0]["state"])
+
             # Remove aircraft close to the runway
             self.airport.remove_aircrafts(self.scenario)
             self.airport.remove_departure_aircrafts(aircrafts)
@@ -142,8 +146,8 @@ class Simulation:
                 # print(pair[0].model, pair[1].model)
                 # pair[0].has_conflict = True
                 # pair[1].has_conflict = True
-
-                raise SimulationException("Conflict found")
+                
+                # raise SimulationException("Conflict found")
 
             # Observe
             if not Config.params["simulator"]["test_mode"]:
