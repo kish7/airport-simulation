@@ -158,7 +158,7 @@ class Controller:
         """
         priority_list = self.ground.priority
 
-        # TODO: UNIMPLEMENTED
+        # TODO: compare the departure time and pioritize the one with longer delay 
         for aircraft_1, aircraft_2 in self.conflicts:
             aircraft_2.set_fronter_info((-1, -1))
 

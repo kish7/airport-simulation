@@ -41,6 +41,7 @@ class StateLogger:
 
         with open(self.output_filename, "a") as fout:
             fout.write(json.dumps(state) + "\n")
+        # print(state) 
         return state
 
     def __parse_aircraft(self, aircraft):

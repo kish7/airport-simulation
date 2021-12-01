@@ -8,7 +8,7 @@ import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from simulator import init_streaming_generator
 
-dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
+dir_path = os.path.dirname(os.path.realpath(__file__)) + '/../'
 AIRPORT_DATA_FOLDER = dir_path + "data/"
 PLAN_INPUT_FOLDER = dir_path + "plans/"
 PLAN_OUTPUT_FOLDER = dir_path + "output/"
