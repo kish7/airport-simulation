@@ -29,6 +29,8 @@ class Simulation:
     def __init__(self):
 
         params = Config.params
+        # Setup the conflict counter
+        self.conflict_count = 0
 
         # Setups the logger
         self.logger = logging.getLogger(__name__)
@@ -124,8 +126,10 @@ class Simulation:
             conflicts, conflicts_dist = self.airport.conflicts
             if conflicts:
                 for idx, conflict in enumerate(conflicts):
+                    self.conflict_count += 1
                     dist = conflicts_dist[idx]
                     print("Found %s", conflict)
+                    print("Conflict Count: %d", self.conflict_count)
                     print("Conflict distance: %d", dist)
                     print(conflict.detailed_description)
                     self.logger.error("Found %s", conflict)
