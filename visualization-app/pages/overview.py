@@ -44,7 +44,7 @@ for name, group in grouped:
 
 traffic_load = states.sort_values(['time'], ascending=[True])
 traffic_load['hour'] = traffic_load['time'].str[0:2].astype(int)
-traffic_grouped = traffic_load.groupby('hour')['callsign'].agg(set)
+traffic_grouped = traffic_load.groupby('hour')['callsign'].agg(lambda x: set(x))
 
 aircraft_mins['atgate_time'].mean()
 aircraft_mins['pushback_time'].mean()
