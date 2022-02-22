@@ -11,7 +11,7 @@ def get_processed_data():
     PATH = pathlib.Path(__file__).parent
     DATA_PATH = PATH.joinpath("../data").resolve()
     states = pd.read_csv(DATA_PATH.joinpath("states.csv"))
-
+    states['airline'] = states['callsign'].apply(lambda x: x[:2])
     return states
 
 def get_aircraft_state_time(states):
@@ -63,3 +63,16 @@ def get_duration(callsign, state, states):
     if len(df_state) != 0:
         state_time = (datetime.strptime(df_state.iloc[-1].time, FMT)-datetime.strptime(df_state.iloc[0].time, FMT)).total_seconds() / 60
     return state_time
+
+def get_state_by_airline(states):
+    path = "visualization-app/data/cache/state_by_airline.csv"
+    if os.path.exists(path):
+        return pd.read_csv(path)
+    grouped = states.groupby('airline').state.value_counts().groupby(level=0)
+    state_by_airline = pd.DataFrame()
+    for name, group in grouped:
+    #     print(name)
+        # print(group.unstack(level=1))
+        state_by_airline = state_by_airline.append(group.unstack(level=1))
+    state_by_airline.to_csv(path, encoding='utf-8')
+    return state_by_airline
