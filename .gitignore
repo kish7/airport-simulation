@@ -128,3 +128,5 @@ data/**/build/*
 output
 batch_output
 build
+
+visualization-app/data
