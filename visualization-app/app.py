@@ -5,11 +5,7 @@ from dash import html
 from dash.dependencies import Input, Output
 from pages import (
     overview,
-    # pricePerformance,
-    # portfolioManagement,
-    # feesMins,
-    # distributions,
-    # newsReviews,
+    airline
 )
 import logging
 import sys
@@ -17,6 +13,7 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 from watchdog.events import FileSystemEventHandler
+from datetime import datetime, date, timedelta
 
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
@@ -32,12 +29,16 @@ app.layout = html.Div(
 # Update page
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
+    if pathname == "/airline":
+        print("8.1. current time: - ", datetime.now())
+        return airline.create_layout(app)
+    print("8. current time: - ", datetime.now())
     return overview.create_layout(app)
-
+    
 class OnMyWatch:
     # Set the directory on watch
     # watchDirectory = "/data"
-    # TODO change to environment variable 
+    # TODO change to environment variable
     watchDirectory = r"/Users/suyanxu/NASA/airport-simulation/visualization-app/data"
   
     def __init__(self):
@@ -72,7 +73,7 @@ class Handler(FileSystemEventHandler):
         
 
 if __name__ == "__main__":
-    watch = OnMyWatch()
-    watch.run()
+    # watch = OnMyWatch()
+    # watch.run()
     app.run_server(debug=True)
 

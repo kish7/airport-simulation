@@ -10,47 +10,28 @@ import pathlib
 import numpy as np
 import datetime
 from datetime import datetime, date, timedelta
+from pages.process import get_processed_data, get_aircraft_stats, get_aircraft_state_time, get_state_distribution, get_state_distribution_by_hour
 
-# get relative data folder
-PATH = pathlib.Path(__file__).parent
-DATA_PATH = PATH.joinpath("../data").resolve()
+print("1. current time: - ", datetime.now())
+states = get_processed_data()
 
-states = pd.read_csv(DATA_PATH.joinpath("states.csv"))
-aircraft_state_time = states.sort_values(['callsign', 'time'], ascending=[True, True])
-aircraft_state_time = aircraft_state_time[['callsign', 'state', 'time']]
-aircraft_state_time['prev_state_time'] = aircraft_state_time.time.shift(1)
-aircraft_state_time = aircraft_state_time.reset_index(drop=True)
+print("2. current time: - ", datetime.now())
+aircraft_state_time = get_aircraft_state_time(states)
 
-def get_duration(callsign, state):
-    df_state = states.loc[(states['callsign']==callsign) & (states['state']==state)]
-    state_time = np.nan
-    if len(df_state) != 0:
-        state_time = (datetime.strptime(df_state.iloc[-1].time, FMT)-datetime.strptime(df_state.iloc[0].time, FMT)).total_seconds() / 60
-    return state_time
-        
-aircraft_mins = pd.DataFrame(columns=('callsign', 'atgate_time', 'pushback_time', 'ramp_time', 'taxi_time', 'stop_time'))
-FMT = '%H:%M:%S'
-i = 0
-for callsign in set(states['callsign'].tolist()):
-    aircraft_mins.loc[i] = [callsign, get_duration(callsign, 'atGate'), get_duration(callsign, 'pushback'), get_duration(callsign, 'ramp'), get_duration(callsign, 'taxi'), get_duration(callsign, 'stop')]
-    i += 1
+print("3. current time: - ", datetime.now())
+aircraft_mins = get_aircraft_stats(states)
 
-state_distribution = states.sort_values(['time'], ascending=[True])
-state_distribution['hour'] = state_distribution['time'].str[0:2].astype(int)
-grouped = state_distribution.groupby('hour')['state'].value_counts().groupby(level=0)
-state_distribution_by_hour = pd.DataFrame()
-for name, group in grouped:
-    state_distribution_by_hour = state_distribution_by_hour.append(group.unstack(level=1))
+print("4. current time: - ", datetime.now())
+state_distribution = get_state_distribution(states)
 
+print("5. current time: - ", datetime.now())
+state_distribution_by_hour = get_state_distribution_by_hour(state_distribution, states)
+
+print("6. current time: - ", datetime.now())
 traffic_load = states.sort_values(['time'], ascending=[True])
 traffic_load['hour'] = traffic_load['time'].str[0:2].astype(int)
 traffic_grouped = traffic_load.groupby('hour')['callsign'].agg(lambda x: set(x))
 
-aircraft_mins['atgate_time'].mean()
-aircraft_mins['pushback_time'].mean()
-aircraft_mins['ramp_time'].mean()
-aircraft_mins['taxi_time'].mean()
-aircraft_mins['stop_time'].mean()
 metric = pd.DataFrame(columns=['metric', 'value'])
 metric.loc[0] = ['average atGate speed (ft/epoch)', states.loc[states['state']=='atGate']['speed'].mean()]
 metric.loc[1] = ['average pushback speed (ft/epoch)', states.loc[states['state']=='pushback']['speed'].mean()]
@@ -63,7 +44,7 @@ metric.loc[7] = ['average ramp time (min)', aircraft_mins['ramp_time'].mean()]
 metric.loc[8] = ['average taxi time (min)', aircraft_mins['taxi_time'].mean()]
 metric.loc[9] = ['average stop time (min)', aircraft_mins['stop_time'].mean()]
 
-
+print("7. current time: - ", datetime.now())
 def create_layout(app):
     # Page layouts
     return html.Div(
