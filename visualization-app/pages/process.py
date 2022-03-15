@@ -3,8 +3,12 @@ import pathlib
 from datetime import datetime, date, timedelta
 import numpy as np
 import os.path
+from pathlib import Path
+
+Path("visualization-app/data/cache").mkdir(parents=True, exist_ok=True)
 
 FMT = '%H:%M:%S'
+
 
 def get_processed_data():
     # get relative data folder

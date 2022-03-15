@@ -14,26 +14,45 @@ from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 from watchdog.events import FileSystemEventHandler
 from datetime import datetime, date, timedelta
+import json
+from flask import Flask, render_template, send_from_directory
 
-app = dash.Dash(
-    __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
-)
-app.title = "Visualization Report"
-server = app.server
+# app = dash.Dash(
+#     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
+# )
+# app.title = "Visualization Report"
+# server = app.server
 
-# Describe the layout/ UI of the app
-app.layout = html.Div(
-    [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
-)
+server = Flask(__name__)
 
-# Update page
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def display_page(pathname):
-    if pathname == "/airline":
-        print("8.1. current time: - ", datetime.now())
-        return airline.create_layout(app)
-    print("8. current time: - ", datetime.now())
-    return overview.create_layout(app)
+# # Describe the layout/ UI of the app
+# app.layout = html.Div(
+#     [dcc.Location(id="url", refresh=False), html.Div(id="page-content")]
+# )
+
+# # Update page
+# @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+# def display_page(pathname):
+#     if pathname == "/airline":
+#         print("8.1. current time: - ", datetime.now())
+#         return airline.create_layout(app)
+#     print("8. current time: - ", datetime.now())
+#     return overview.create_layout(app)
+
+@server.route('/')
+def index():
+	return render_template('index.html')
+
+# Get states data
+@server.route('/get_states', methods=['GET', 'POST'])
+def get_states():
+	# f = open('output/real-west-all-terminals/states.json')
+    # states = json.load(f)
+    states = [json.loads(line) for line in open('output/real-west-all-terminals/states.json', 'r')]
+    return json.dumps(states[-1])
+
+
+
     
 class OnMyWatch:
     # Set the directory on watch
@@ -75,5 +94,6 @@ class Handler(FileSystemEventHandler):
 if __name__ == "__main__":
     # watch = OnMyWatch()
     # watch.run()
-    app.run_server(debug=True)
+    # app.run_server(debug=True)
+    server.run(host="0.0.0.0", port=5002,debug = True)
 

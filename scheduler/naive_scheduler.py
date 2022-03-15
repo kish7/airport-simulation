@@ -34,6 +34,7 @@ class Scheduler(AbstractScheduler):
             if aircraft.itinerary is not None:
                 continue
             itinerary = self.schedule_aircraft(aircraft, simulation)
+            print('\033[91m'+"here1!"+'\033[0m: '+str(itinerary))
             itineraries[aircraft] = itinerary
             aircraft.set_itinerary(itinerary)
 

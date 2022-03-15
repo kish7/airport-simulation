@@ -126,7 +126,10 @@ data/**/build/*
 
 ### Output
 output
+output2
 batch_output
 build
 
 visualization-app/data
+visualization-app/static
+visualization-app/templates

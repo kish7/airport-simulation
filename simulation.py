@@ -79,6 +79,7 @@ class Simulation:
         """Moves the states of this simulation to the next state."""
 
         self.logger.debug("\nCurrent Time: %s", self.now)
+        print("\nCurrent Time: %s", self.now)
 
         try:
 
@@ -101,6 +102,8 @@ class Simulation:
             self.last_schedule_exec_time = time.time() - start  # seconds
             self.last_schedule_time = self.now
             self.logger.info("Last schedule time is updated to %s",
+                                self.last_schedule_time)
+            print("Last schedule time is updated to %s",
                                 self.last_schedule_time)
 
             # # Inject uncertainties
