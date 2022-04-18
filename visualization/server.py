@@ -4,6 +4,8 @@ import json
 from flask import Flask, request, abort
 import sys
 import time
+import dash
+from register import register_dashapps
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from simulator import init_streaming_generator
@@ -14,6 +16,7 @@ PLAN_INPUT_FOLDER = dir_path + "plans/"
 PLAN_OUTPUT_FOLDER = dir_path + "output/"
 
 app = Flask(__name__, static_url_path="")
+register_dashapps(app)
 
 # WORKAROUND: Since Flask does not support object storage in sessions,
 # use a dictionary to store the generator for each client.
@@ -24,6 +27,10 @@ simulators = {}
 @app.route("/")
 def send_index():
     return app.send_static_file("index.html")
+
+@app.route("/analysis")
+def analysis():
+    return app.send_static_file("analysis.html")
 
 
 # Get Plans
@@ -178,4 +185,4 @@ def get_data_build(airport):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1")
+    app.run(host="127.0.0.1", debug = True)

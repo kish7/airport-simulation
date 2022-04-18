@@ -10,7 +10,7 @@ import pathlib
 import numpy as np
 import datetime
 from datetime import datetime, date, timedelta
-from pages.process import get_processed_data, get_aircraft_stats, get_aircraft_state_time, get_state_distribution, get_state_distribution_by_hour
+from dashapp.pages.process import get_processed_data, get_aircraft_stats, get_aircraft_state_time, get_state_distribution, get_state_distribution_by_hour
 
 print("1. current time: - ", datetime.now())
 states = get_processed_data()
