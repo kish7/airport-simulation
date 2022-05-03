@@ -5,7 +5,8 @@ import pandas_datareader as pdr
 def register_callbacks(dashapp):
     from dashapp.pages import (
         overview,
-        airline
+        airline,
+        dynamic
     )
 
     # Update page
@@ -14,5 +15,8 @@ def register_callbacks(dashapp):
         if pathname == "/dashboard/airline":
             print("switch to airline ", dt.now())
             return airline.create_layout(dashapp)
+        if pathname == "/dashboard/dynamic":
+            print("switch to dynamic ", dt.now())
+            return dynamic.create_layout(dashapp)
         print("switch to default dashboard", dt.now())
         return overview.create_layout(dashapp)

@@ -5,7 +5,7 @@ import numpy as np
 import os.path
 from pathlib import Path
 
-Path("visualization-app/data/cache").mkdir(parents=True, exist_ok=True)
+Path("visualization/dashapp/data/cache").mkdir(parents=True, exist_ok=True)
 
 FMT = '%H:%M:%S'
 
@@ -19,7 +19,7 @@ def get_processed_data():
     return states
 
 def get_aircraft_state_time(states):
-    path = "visualization-app/data/cache/aircraft_state_time.csv"
+    path = "visualization/dashapp/data/cache/aircraft_state_time.csv"
     if os.path.exists(path):
         return pd.read_csv(path)
     aircraft_state_time = states.sort_values(['callsign', 'time'], ascending=[True, True])
@@ -30,7 +30,7 @@ def get_aircraft_state_time(states):
     return aircraft_state_time
 
 def get_aircraft_stats(states):
-    path = "visualization-app/data/cache/aircraft_mins.csv"
+    path = "visualization/dashapp/data/cache/aircraft_mins.csv"
     if os.path.exists(path):
         return pd.read_csv(path)
     aircraft_mins = pd.DataFrame(columns=('callsign', 'atgate_time', 'pushback_time', 'ramp_time', 'taxi_time', 'stop_time'))
@@ -42,7 +42,7 @@ def get_aircraft_stats(states):
     return aircraft_mins
 
 def get_state_distribution(states):
-    path = "visualization-app/data/cache/state_distribution.csv"
+    path = "visualization/dashapp/data/cache/state_distribution.csv"
     if os.path.exists(path):
         return pd.read_csv(path)
     state_distribution = states.sort_values(['time'], ascending=[True])
@@ -51,7 +51,7 @@ def get_state_distribution(states):
     return state_distribution
 
 def get_state_distribution_by_hour(state_distribution, states):
-    path = "visualization-app/data/cache/state_distribution_by_hour.csv"
+    path = "visualization/dashapp/data/cache/state_distribution_by_hour.csv"
     if os.path.exists(path):
         return pd.read_csv(path)
     grouped = state_distribution.groupby('hour')['state'].value_counts().groupby(level=0)
@@ -69,7 +69,7 @@ def get_duration(callsign, state, states):
     return state_time
 
 def get_state_by_airline(states):
-    path = "visualization-app/data/cache/state_by_airline.csv"
+    path = "visualization/dashapp/data/cache/state_by_airline.csv"
     if os.path.exists(path):
         return pd.read_csv(path)
     grouped = states.groupby('airline').state.value_counts().groupby(level=0)

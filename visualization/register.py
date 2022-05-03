@@ -10,6 +10,7 @@ def register_dashapps(app):
         overview,
         airline
     )
+
     
     # Meta tags for viewport responsiveness
     meta_viewport = {

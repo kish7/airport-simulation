@@ -33,6 +33,9 @@ class StreamingDataConnector extends DataConnector {
 
     loadStreamingData(plan, id = -1, steps = 1) {
         return new Promise((res, rej) => {
+             // TODO 
+            let analysisButton = document.getElementById('open-analysis');
+            analysisButton.style.display='block';
             $.get(`/data/streaming?plan=${plan}&steps=${steps}&id=${id}`, data => {
                 res(JSON.parse(data));
             }).fail(function (jqXHR, textStatus) {
@@ -141,5 +144,48 @@ class BatchDataConnector extends DataConnector {
         } else {
             alert("Surface data not ready.");
         }
+    }
+}
+
+class AnalysisDataConnector extends DataConnector {
+    constructor(plan, callback) {
+        super(plan);
+
+        // no data loading is necessary here
+    }
+
+    // how to pass plan?
+
+    static loadStates(timestamp, plan, index) {
+        return new Promise((res, rej) => {
+            $.get(`/output/states?timestamp=${timestamp}&plan=${plan}&index=${index}`, data => {
+                res(JSON.parse(data));
+            }).fail(function (jqXHR, textStatus) {
+                alert(jqXHR.responseText);
+            });
+        });
+    }
+    
+
+    async nextState(stepSize = 1) {
+        // this.stateIndex = (this.stateIndex + stepSize) % this.dataSize;
+        // return this.currentState();
+    }
+
+    async prevState(stepSize = 1) {
+        // this.stateIndex = (this.stateIndex + this.dataSize - stepSize) % this.dataSize;
+        // return this.currentState();
+    }
+
+    currentState() {
+        // return this.data["state"][this.stateIndex];
+    }
+
+    getSurfaceData() {
+        // if (this.data) {
+        //     return this.data["surface"];
+        // } else {
+        //     alert("Surface data not ready.");
+        // }
     }
 }
