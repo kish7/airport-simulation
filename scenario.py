@@ -88,7 +88,8 @@ class Scenario:
                 arrival["airport"],
                 surface.get_node(arrival["gate"]),
                 str2time(arrival["time"]),
-                str2time(arrival["appear_time"])
+                str2time(arrival["appear_time"]),
+                arrival["route"]
             ))
 
         # Parse departure flights into the array
@@ -100,7 +101,8 @@ class Scenario:
                 departure["airport"],
                 surface.get_node(departure["gate"]),
                 str2time(departure["time"]),
-                str2time(departure["appear_time"])
+                str2time(departure["appear_time"]),
+                departure["route"]
             ))
 
         return Scenario(arrivals, departures)
