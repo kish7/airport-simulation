@@ -140,6 +140,7 @@ class Aircraft:
         self.appear_time = ""
         self.sim_time = 0
         self.has_conflict = False
+        self.idle_time = 0
 
     @staticmethod
     def fullname2callsign(fullname):
