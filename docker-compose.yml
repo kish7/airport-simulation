@@ -1,0 +1,14 @@
+version: "3.9" 
+services:
+  server:
+    build: .
+    container_name: airport-simulation-server
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - .:/usr/src/app
+    # environment:
+    #   - FLASK_APP=visualization/server.py 
+    #   - FLASK_ENV=development 
+    # command: ["/bin/bash", "-c", "source activate myenv && flask run --host=0.0.0.0"]
+    command: ["/bin/bash", "-c", "source activate myenv && PYTHONPATH=/usr/src/app/visualization:$PYTHONPATH gunicorn visualization.server:app -b 0.0.0.0:5000 --reload"]
