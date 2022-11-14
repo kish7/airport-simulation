@@ -10,6 +10,8 @@ from utils import export_to_json, create_output_folder
 dir_path = os.path.dirname(os.path.realpath(__file__))
 REAL_DEPARTURE_PATH = dir_path + "/updated_all_terminal_departure.csv"
 REAL_ARRIVAL_PATH = dir_path + "/updated_all_terminal_arrival.csv"
+# REAL_DEPARTURE_PATH = dir_path + "/all_terminal_arrival_route.csv"
+# REAL_ARRIVAL_PATH = dir_path + "/all_terminal_arrival_route.csv"
 OUTPUT_FOLDER = dir_path + "/build/"
 
 # Setups logger
@@ -80,27 +82,29 @@ def get_departure_from_csv():
     flight_list = df["Flight"].tolist()
     estimated_list = df["Estimated"].tolist()
     scheduled_list = df["Scheduled"].tolist()
+    route_list = None # df["route"].tolist() if df["route"] is not None else None
     for i in range(1, size):
         new_flight = departure_flight_template.copy()
-        if terminal_list[i] == '1':
+        if str(terminal_list[i]) == '1':
             new_flight["terminal"] = 1
-        elif terminal_list[i] == '2':
+        elif str(terminal_list[i]) == '2':
             new_flight["terminal"] = 2
-        elif terminal_list[i] == '3':
+        elif str(terminal_list[i]) == '3':
             new_flight["terminal"] = 3
-        elif terminal_list[i] == 'Int\'l':
+        elif str(terminal_list[i]) == 'Int\'l':
             new_flight["terminal"] = 4
+        else:
+            new_flight["terminal"] = 3
         if type(gate_list[i]) is not str and math.isnan(gate_list[i]):
             new_flight["gate"] = random.choice(terminal_gates[int(new_flight[
                                                                       "terminal"]) - 1])
-        elif gate_list[i] not in terminal_gates[int(new_flight[
-                                                        "terminal"]) - 1]:
+        elif str(gate_list[i]) not in terminal_gates[int(new_flight["terminal"]) - 1]:
             continue
         else:
-            new_flight["gate"] = gate_list[i]
+            new_flight["gate"] = str(gate_list[i])
 
         new_flight["model"] = flight_list[i]
-        new_flight["callsign"] = airline_list[i].replace(" Airlines", "") + "-" \
+        new_flight["callsign"] = str(airline_list[i]).replace(" Airlines", "") + "-" \
                                  + str(
             flight_list[i]) + "-D"
         new_flight["time"] = set_new_time(
@@ -111,6 +115,7 @@ def get_departure_from_csv():
             if new_flight["gate"] in v:
                 new_flight["spot"] = k
                 break
+        new_flight["route"] =  ['E','A','B','G']# route_list[i].split('->')
         departures.append(new_flight)
     return departures
 
@@ -125,6 +130,7 @@ def get_arrival_from_csv():
     flight_list = df["Flight"].tolist()
     estimated_list = df["Estimated"].tolist()
     scheduled_list = df["Scheduled"].tolist()
+    route_list = None #df["route"].tolist() if df["route"] is not None else None
     for i in range(1, size):
         new_flight = arrival_flight_template.copy()
         if terminal_list[i] == '1':
@@ -135,17 +141,19 @@ def get_arrival_from_csv():
             new_flight["terminal"] = 3
         elif terminal_list[i] == 'Int\'l':
             new_flight["terminal"] = 4
+        else:
+            new_flight["terminal"] = 3
         if type(gate_list[i]) is not str and math.isnan(gate_list[i]):
             new_flight["gate"] = random.choice(terminal_gates[int(new_flight[
                                                                       "terminal"]) - 1])
-        elif gate_list[i] not in terminal_gates[int(new_flight[
+        elif str(gate_list[i]) not in terminal_gates[int(new_flight[
                                                         "terminal"]) - 1]:
             continue
         else:
-            new_flight["gate"] = gate_list[i]
+            new_flight["gate"] = str(gate_list[i])
 
         new_flight["model"] = flight_list[i]
-        new_flight["callsign"] = airline_list[i].replace(" Airlines",
+        new_flight["callsign"] = str(airline_list[i]).replace(" Airlines",
                                                          "") + "-" + str(
             flight_list[i]) + "-A"
         new_flight["time"] = set_new_time(
@@ -156,6 +164,7 @@ def get_arrival_from_csv():
             if new_flight["gate"] in v:
                 new_flight["spot"] = k
                 break
+        new_flight["route"] =  ['E','A','B','G']# route_list[i].split('->')
         arrivals.append(new_flight)
     return arrivals
 

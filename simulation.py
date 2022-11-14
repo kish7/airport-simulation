@@ -29,6 +29,8 @@ class Simulation:
     def __init__(self):
 
         params = Config.params
+        # Setup the conflict counter
+        self.conflict_count = 0
 
         # Setups the logger
         self.logger = logging.getLogger(__name__)
@@ -77,6 +79,7 @@ class Simulation:
         """Moves the states of this simulation to the next state."""
 
         self.logger.debug("\nCurrent Time: %s", self.now)
+        print("\nCurrent Time: %s", self.now)
 
         try:
 
@@ -99,6 +102,8 @@ class Simulation:
             self.last_schedule_exec_time = time.time() - start  # seconds
             self.last_schedule_time = self.now
             self.logger.info("Last schedule time is updated to %s",
+                                self.last_schedule_time)
+            print("Last schedule time is updated to %s",
                                 self.last_schedule_time)
 
             # # Inject uncertainties
@@ -124,8 +129,10 @@ class Simulation:
             conflicts, conflicts_dist = self.airport.conflicts
             if conflicts:
                 for idx, conflict in enumerate(conflicts):
+                    self.conflict_count += 1
                     dist = conflicts_dist[idx]
                     print("Found %s", conflict)
+                    print("Conflict Count: %d", self.conflict_count)
                     print("Conflict distance: %d", dist)
                     print(conflict.detailed_description)
                     self.logger.error("Found %s", conflict)

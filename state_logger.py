@@ -17,6 +17,7 @@ class StateLogger:
     def __init__(self):
 
         self.states = []
+        self.idle_aircraft = {}
         self.logger = logging.getLogger(__name__)
 
         try:
@@ -41,10 +42,19 @@ class StateLogger:
 
         with open(self.output_filename, "a") as fout:
             fout.write(json.dumps(state) + "\n")
-        # print(state) 
         return state
 
     def __parse_aircraft(self, aircraft):
+
+        # check if aircraft is idle
+        if aircraft.callsign in self.idle_aircraft:
+            if self.idle_aircraft[aircraft.callsign] == aircraft.precise_location.geo_pos:
+                aircraft.idle_time = aircraft.idle_time + 1
+            else:
+                aircraft.idle_time = 0
+                del self.idle_aircraft[aircraft.callsign] 
+        else:
+            self.idle_aircraft[aircraft.callsign] = aircraft.precise_location.geo_pos
 
         itinerary = self.__parse_itinerary(aircraft.itinerary)
         itinerary_index = aircraft.itinerary.index if itinerary else None
@@ -59,6 +69,7 @@ class StateLogger:
             "state": aircraft.state.name,
             "speed": aircraft.speed,
             "is_delayed": aircraft.is_delayed,
+            "idle_time": aircraft.idle_time,
             "location": aircraft.precise_location.geo_pos,
             "itinerary": itinerary,
             "itinerary_index": itinerary_index,

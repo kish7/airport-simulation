@@ -4,6 +4,9 @@ import json
 from flask import Flask, request, abort
 import sys
 import time
+import dash 
+from register import register_dashapps
+from dateutil import parser
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from simulator import init_streaming_generator
@@ -14,6 +17,7 @@ PLAN_INPUT_FOLDER = dir_path + "plans/"
 PLAN_OUTPUT_FOLDER = dir_path + "output/"
 
 app = Flask(__name__, static_url_path="")
+register_dashapps(app)
 
 # WORKAROUND: Since Flask does not support object storage in sessions,
 # use a dictionary to store the generator for each client.
@@ -24,6 +28,69 @@ simulators = {}
 @app.route("/")
 def send_index():
     return app.send_static_file("index.html")
+
+@app.route("/analysis")
+def analysis():
+    return app.send_static_file("analysis.html")
+
+# Get states from output
+# query contains time from the analysis tool
+@app.route('/output/states')
+def api_output_states():
+    # return the line where closest to time in query
+    time = parser.parse(request.args.get("timestamp"))
+    plan = request.args.get("plan")
+    index = int(request.args.get("index"))
+    print("query time= ", time, ", plan=", plan, ", index=", index)
+    # Finds the state file
+    filename = PLAN_OUTPUT_FOLDER + plan + "/states.json"
+    if not os.path.isfile(filename):
+        raise Exception("State file not found at %s" % filename)
+
+    # Reads the file
+    with open(filename) as f:
+        content = [json.loads(j) for j in f.read().split("\n") if j]
+    
+    # current number of flights in different states
+    current_total = len(content[-1]['aircrafts'])
+    # all state after and including index
+    print("content",type(content))
+    print("index",type(index))
+    # remove itinerary from aircrafts array to send to front end analysis tool
+    new_content = content[index: len(content)]
+    for item in new_content:
+        aircrafts = item["aircrafts"] 
+        idle_aircrafts = dict()
+        for aircraft in aircrafts:
+            del aircraft["itinerary"]
+            if aircraft["idle_time"] != 0:
+                # if aircraft["state"] not in idle_aircrafts:
+                #     idle_aircrafts[aircraft["state"]] = []
+                # idle_aircrafts[aircraft["state"]]+=[aircraft["callsign"], aircraft["idle_time"]]
+                idle_aircrafts.setdefault(aircraft["state"], {})[aircraft["callsign"]] = aircraft["idle_time"]# {aircraft["callsign"]:aircraft["idle_time"]}
+        # add statictics
+        print(idle_aircrafts)
+        item["stats"] = {
+            "total": len(aircrafts),
+            "taxi": sum(aircraft['state'] =='taxi' for aircraft in aircrafts),
+            "ramp": sum(aircraft['state'] =='ramp' for aircraft in aircrafts),
+            "pushback": sum(aircraft['state'] =='pushback' for aircraft in aircrafts),
+            "idle_aircrafts": json.dumps(idle_aircrafts),
+        }
+
+    # is fetch new content?
+    updated = False if (index >= len(content)) else True
+    return_json = {
+        "updated": updated,
+        "current_state_distribution": {
+            "total": current_total,
+        },
+        "new_states": new_content,
+        "new_index": len(content),
+        "Error": False,
+        "time": time.strftime("%d-%b-%Y")
+    }
+    return json.dumps(return_json)
 
 
 # Get Plans
@@ -61,7 +128,9 @@ def api_batch_data():
     except Exception as e:
         abort(400, description=str(e))
 
-
+# 
+#
+#
 @app.route("/data/streaming")
 def api_streaming_data():
     try:
@@ -178,4 +247,4 @@ def get_data_build(airport):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1")
+    app.run(host="127.0.0.1", debug = True)

@@ -9,7 +9,7 @@ from utils import export_to_json, create_output_folder
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 OUTPUT_FOLDER = dir_path + "/build/"
-INPUT_KML = dir_path + "/airport.kml"
+INPUT_KML = dir_path + "/airport_new2.kml"
 BACKGROUND_IMAGE_SIZE = 960
 
 # Setups logger

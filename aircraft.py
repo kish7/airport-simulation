@@ -97,7 +97,7 @@ class Aircraft:
     LOCATION_LEVEL_COARSE = 0
     LOCATION_LEVEL_PRECISE = 1
 
-    def __init__(self, fullname, model, location, is_departure):
+    def __init__(self, fullname, model, location, is_departure, taxi_route):
 
         self.logger = logging.getLogger(__name__)
 
@@ -140,6 +140,8 @@ class Aircraft:
         self.appear_time = ""
         self.sim_time = 0
         self.has_conflict = False
+        self.idle_time = 0
+        self.taxi_route = taxi_route
 
     @staticmethod
     def fullname2callsign(fullname):

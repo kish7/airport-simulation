@@ -41,6 +41,7 @@ class Config(metaclass=MetaConfig):
     DATA_ROOT_DIR_PATH = BASE_DIR + "/data/%s/build/"
     DATA_GENERATION_DIR_PATH = BASE_DIR + "/data/%s/"
     OUTPUT_DIR = BASE_DIR + "/output/"
+    # OUTPUT_DIR = BASE_DIR + "/visualization-app/output2/"
     PLANS_DIR = BASE_DIR + "/plans/"
     BATCH_OUTPUT_DIR = BASE_DIR + "/batch_output/"
 

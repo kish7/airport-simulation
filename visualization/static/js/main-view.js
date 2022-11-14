@@ -155,6 +155,8 @@ class VisualizationView {
         $("#control-run").click(e => {
             e.preventDefault();
             this.toggleAutoRun();
+            console.log("clicked play"); // alison
+            this.controlRealTimeAnalysis();
             return false;
         });
 
@@ -300,6 +302,14 @@ class VisualizationView {
             // $("#control-run").addClass("running");
             $("#control-run").attr('uk-icon', "ban");
         }
+    }
+
+    /**
+     * This method is called from the play button (or forward to backward button), 
+     * to synchronize the simulator with the real time analysis tool
+     */
+    controlRealTimeAnalysis() {
+
     }
 }
 
