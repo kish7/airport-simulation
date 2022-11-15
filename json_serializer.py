@@ -51,8 +51,6 @@ def deserialize_aircraft(json_map):
         itinerary.targets.append(tmp_target)
     itinerary.index = itinerary_info["index"]
 
-    print(len(itinerary.targets), itinerary.index, itinerary.is_completed)
-
     aircraft.itinerary = itinerary
     return aircraft
         

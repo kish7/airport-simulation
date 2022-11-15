@@ -188,6 +188,8 @@ if __name__ == "__main__":
 
     for message in consumer:
         message = message.value
+        print(message)
         controller.fake_ground["priority"] = message["priority"]
         controller.fake_ground["aircrafts"] = list(map(deserialize_aircraft, message["aircrafts"]))
         controller.tick()
+        print("controller tick done")
