@@ -5,6 +5,8 @@ import itertools
 import logging
 import os
 from collections import deque
+from json import dumps
+from kafka import KafkaProducer
 
 from aircraft import Aircraft
 from config import Config
@@ -18,6 +20,7 @@ from ramp_controller import RampController
 from intersection_controller import IntersectionController
 from terminal_controller import TerminalController
 
+from json_serializer import *
 
 class Airport:
     """`Airport` contains the surface and all the aircraft currently moving or
@@ -61,6 +64,10 @@ class Airport:
         self.ramp_control = RampController(self)
 
         self.max_airpcrafts_running = Config.params["scheduler"]["max_airpcrafts_running"]
+
+        self.producer = KafkaProducer(bootstrap_servers=['localhost:9092'],
+                         value_serializer=lambda x: 
+                         dumps(x).encode('utf-8'))
 
     def apply_schedule(self, schedule):
         """Applies a schedule onto the active aircraft in the airport."""
@@ -347,6 +354,14 @@ class Airport:
         # Ground Controller should observe all the activities on the ground.
         if predict is False:
             self.controller.tick()
+            data = {
+                "priority": dumps(self.priority, default=str),
+                "aircrafts": list(map(serialize_aircraft, self.aircrafts))
+            }
+            print(data)
+            self.producer.send('controller', value=data)           
+            print("airport producer send message")     
+
             pass
         # Ticks on all subjects under the airport to move them into the next state
 
