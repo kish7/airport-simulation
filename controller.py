@@ -3,23 +3,28 @@ Ground Controller oversees the aircraft movement on the ground. It continuously 
 commands to pilots when there is a notable situation.
 """
 import collections
+from json import loads
+from kafka import KafkaConsumer
 
 from config import Config
 
+from json_serializer import *
 
 class Controller:
-    def __init__(self, ground):
+    def __init__(self, ground=None):
         self.ground = ground
 
         self.PILOT_VISION = Config.params["aircraft_model"]["pilot_vision"]
         self.CLOSE_NODE_THRESHOLD = Config.params["simulation"]["close_node_threshold"]
+
+        self.fake_ground = {}
 
     def tick(self):
         self.__observe()
         self.__resolve_conflicts()
 
     def __observe(self):
-        aircraft_list = self.ground.aircrafts
+        aircraft_list = self.ground.aircrafts if self.ground else self.fake_ground["aircrafts"]
 
         self.aircraft_location_lookup = collections.defaultdict(list)  # {link: (aircraft, distance_on_link)}
         self.aircraft_ahead_lookup = {}  # {aircraft: (target_speed, relative_distance)}
@@ -156,7 +161,7 @@ class Controller:
         Send command to one of the pilots to wait there.
         Will call Aircraft.Pilot.Slowdown() or something alike.
         """
-        priority_list = self.ground.priority
+        priority_list = self.ground.priority if self.ground else self.fake_ground["priority"]
 
         # TODO: compare the departure time and pioritize the one with longer delay 
         for aircraft_1, aircraft_2 in self.conflicts:
@@ -168,3 +173,23 @@ class Controller:
 
 class NoCloseAircraftFoundError(Exception):
     pass
+
+
+if __name__ == "__main__":
+    print("controller started")
+    controller = Controller()
+    consumer = KafkaConsumer(
+        'controller',
+        bootstrap_servers=['localhost:9092'],
+        auto_offset_reset='earliest',
+        enable_auto_commit=True,
+        group_id='my-group',
+        value_deserializer=lambda x: loads(x.decode('utf-8')))
+
+    for message in consumer:
+        message = message.value
+        print(message)
+        controller.fake_ground["priority"] = message["priority"]
+        controller.fake_ground["aircrafts"] = list(map(deserialize_aircraft, message["aircrafts"]))
+        controller.tick()
+        print("controller tick done")

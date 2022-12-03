@@ -20,3 +20,4 @@ webdriver-manager==3.5.4
 selenium==4.0.0a7
 sortedcontainers
 pandas-datareader
+kafka-python

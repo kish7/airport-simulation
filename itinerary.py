@@ -195,7 +195,10 @@ class Itinerary:
         while index < self.length and type(self.targets[index]) is HoldLink:
             index += 1
 
-        if self.is_completed:
+        # TODO: why is_completed is used here?
+        # if self.is_completed:
+        #     return None
+        if index >= self.length:
             return None
 
         return self.targets[index]
