@@ -17,6 +17,19 @@ ASSET2 is a generic airport simulation tool for research purpose. It is designed
 >
 > **Please avoid Python>=3.7.0** because it breaks the legacy Cython, which one of the dependencies line-profiler (test package) depends on. The issue has not been [fixed](https://github.com/rkern/line_profiler/issues) at the moment. Try to install a lower version instead.
 
+
+Traditionally the application had a single point of entry and was run as a single application, in this branch '22practicum-arch' is in the process of porting to the newly designed Software Architecture. 
+
+To run the application as per the new Software Architecture, there are three components that have to be run independently in the same host machine.
+
+1. Kafka Messaging Infrastructure 
+2. Simulation Application
+3. Controller Module 
+
+###  Running Kafka Messaging Infrastructure
+
+Follow steps mentioned in the README.md file within 'messagingInfra' directory
+
 ### First-Time Run
 
 ```sh
@@ -31,6 +44,34 @@ $ python generate.py
 $ cd ../../
 $ python visualization/server.py
 (or $pythonw visualization/server.py)
+```
+
+#### (Or)
+###  To run the Simulation Application using Docker
+The deployment has been automated using the Dockerfile and docker-compose.yml files. 
+
+
+To build and run the application:
+```sh
+$ docker-compose up -d
+```
+
+To verify that the Docker container is running:
+```sh
+$ docker ps -a
+```
+
+To stop the application:
+```sh
+$ docker-compose up -d
+```
+
+Note: When running the simulator using Docker, ensure that the host network is reachable by using `network_mode: "host"` so that the server can reach the kafka messaging broker.
+
+### To run the Controller Module
+The controller module can be run on the host machine using the following command:
+```
+$ python controller.py
 ```
 
 
