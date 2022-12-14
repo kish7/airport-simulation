@@ -30,7 +30,7 @@ To run the application as per the new Software Architecture, there are three com
 
 Follow steps mentioned in the README.md file within 'messagingInfra' directory
 
-### First-Time Run
+### First-Time Run of Simulation Application
 
 ```sh
 $ mkdir -p ~/.config/matplotlib/
@@ -63,7 +63,7 @@ $ docker ps -a
 
 To stop the application:
 ```sh
-$ docker-compose up -d
+$ docker-compose down -d
 ```
 
 Note: When running the simulator using Docker, ensure that the host network is reachable by using `network_mode: "host"` so that the server can reach the kafka messaging broker.
